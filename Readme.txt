@@ -36,7 +36,7 @@ Program Flow:
 		  This process is repeated recursively until a deposit location is found or the travel time exceeds an already
 		    established best time for another travel path - if the new path is shorter, the new path and time is saved
 		  Once the best path (shortest time) is established, it is returned for display
-		  Note: An InvalidDataException is thrown if any errors are found with User Data and an error message is displayed
+		  Note: An InvalidDataException is thrown if errors are found with User Data and an error message is displayed
 
   4. display user name, waypoints path, deposit location and total time distance
         The best path is displayed as standard output as shown:
