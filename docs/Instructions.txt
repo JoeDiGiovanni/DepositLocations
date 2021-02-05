@@ -1,0 +1,46 @@
+William Hill Coding Challenge
+
+Nevada’s largest sports book operator, William Hill, offers convenient deposit locations at William Hill sports books,
+kiosks at PT’s Taverns, 7-Eleven stores, CVS stores, and Family Dollar stores throughout Nevada.
+
+As a superstar William Hill backend engineer, you’ve been asked to implement a system that will provide app users
+with directions to their nearest deposit location.
+
+Using your favorite JVM (Scala preferred) or .NET runtime language, implement a console application that will parse the input
+ and for each user return the path to the nearest deposit location and the total travel time to reach that destination.
+
+The first section of input defines a bi-directional graph in which the nodes are waypoints or deposit locations,
+and the edges are travel times. Waypoints are represented with the letter W followed by a number (e.g. “W4”).
+Deposit locations are represented with “SB”, “7E”, “PTS”, “CVS” or “FD”:
+<node 1> <node 2> <travel time>
+
+The next section of input consists of app usernames followed by their current location:
+<username> <node>
+
+Your program’s output should be in the following format:
+<username> <node 1> <node 2> <node 3> <total travel time>
+
+Example Input:
+W1 W3 4
+W1 SB 2
+W2 W4 5
+W3 W2 3
+W3 W5 5
+W3 7E 6
+W4 W8 4
+W5 PTS 3
+W6 W3 3
+W6 7E 2
+W7 W5 5
+W7 7E 2
+W7 FD 1
+W8 W9 8
+W8 CVS 2
+W9 W10 6
+W10 CVS 5
+User123 W9
+User234 W3
+
+Example Output:
+User123 W9 W8 CVS 10
+User234 W3 W6 7E 5
