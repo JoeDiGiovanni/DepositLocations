@@ -21,7 +21,7 @@ object DataService {
 
 		// check that an input file name was provided on the command line - if not use the default file name
 		if (args.length < 1) {
-			LoggerService.log(s"Missing input file name - using default: $inputFileName", "ERRR", 6)
+			LogService.log(s"Missing input file name - using default: $inputFileName", "ERRR", 6)
 		} else {
 			inputFileName = args(0)
 		}
@@ -44,15 +44,15 @@ object DataService {
 	def loadInputDataFromFile(inputFileName: String): List[String] = {
 		var inputFile: BufferedSource = null
 		var inputData: List[String] = null
-		LoggerService.log(s"Input file name: $inputFileName", "INFO")
+		LogService.log(s"Input file name: $inputFileName", "INFO")
 
 		// Read the file contents into a list
 		try {
 			inputFile = Source.fromFile(inputFileName)
 			inputData = inputFile.getLines().toList
 		} catch {
-			case _: FileNotFoundException => LoggerService.log(s"File Not Found: $inputFileName", "ERRR", 6)
-			case _: IOException => LoggerService.log(s"File Read Error: $inputFileName", "ERRR", 7)
+			case _: FileNotFoundException => LogService.log(s"File Not Found: $inputFileName", "ERRR", 6)
+			case _: IOException => LogService.log(s"File Read Error: $inputFileName", "ERRR", 7)
 		} finally {
 			if (inputFile != null) inputFile.close
 		}
@@ -68,7 +68,7 @@ object DataService {
 				processInputDataLine(line)
 			} catch {
 					case e: InvalidDataException =>
-						LoggerService.log(s"[${e.getMessage}] $line ==> INPUT IGNORED", "ERRR", 6)
+						LogService.log(s"[${e.getMessage}] $line ==> INPUT IGNORED", "ERRR", 6)
 			}
 		}
 		// return the parsed data in two lists:
@@ -103,7 +103,7 @@ object DataService {
 				// Some kind of data format error
 				case _ => throw InvalidDataException("Invalid Data Format")
 			}
-			LoggerService.log(s"[${pieces.length}] $line", "DATA", 2)
+			LogService.log(s"[${pieces.length}] $line", "DATA", 2)
 		} catch {
 			case e: InvalidDataException => throw e
 			case _: NumberFormatException => throw InvalidDataException("NumberFormatException")

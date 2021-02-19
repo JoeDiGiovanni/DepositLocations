@@ -4,7 +4,7 @@ import scala.collection.mutable.ListBuffer
 
 // Logger Service class with Log Level support and default config and message levels
 // Log Message Levels:  5 = Highest Msg Level  0 = Lowest Level  3 = Default  > 5 for Errors
-object LoggerService {
+object LogService {
 	private val logErrorThreshold: Int = 5
 	private val printRealTime: Boolean = false
 	private val logList: ListBuffer[LogMsg] = new ListBuffer[LogMsg]
@@ -38,7 +38,7 @@ object LoggerService {
 	}
 
 	// clear all the logged messages
-	def clearLogMessages() {
+	private def clearLogMessages(): Unit = {
 		logList.clear()
 	}
 

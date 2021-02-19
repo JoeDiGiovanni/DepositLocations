@@ -1,7 +1,7 @@
 package testpackage.com.entities
 
 import testpackage.com.entities.NodeType.NodeType
-import testpackage.com.services.LoggerService
+import testpackage.com.services.LogService
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -17,7 +17,7 @@ object PathwaysGrid {
 	// Build the Grid of the waypoints and deposit locations
 	// Allows additional data points to be appended by passing appendNodes=true
 	def buildPathwaysGrid(inputDataTimeDistance: ListBuffer[InputTravelTime], appendNodes: Boolean = false): Unit = {
-		LoggerService.log(s"buildPathwaysGrid:", "INFO", 2)
+		LogService.log(s"buildPathwaysGrid:", "INFO", 2)
 
 		// Clear any existing data if this is not an append
 		if (!appendNodes) {
@@ -37,14 +37,14 @@ object PathwaysGrid {
 				if (nodeMap(tupleData.nodeIdA) == NodeType.WAY) {
 					upsertPathway(tupleData.nodeIdA, tupleData.nodeIdB, tupleData.travelTime)
 				} else {
-					LoggerService.log(s"Found Deposit Location - expected Way Point: $tupleData", "WARN", 6)
+					LogService.log(s"Found Deposit Location - expected Way Point: $tupleData", "WARN", 6)
 				}
 				// if NodeIdB is NOT a deposit location, then add the reverse edge path
 				if (nodeMap(tupleData.nodeIdB) == NodeType.WAY) {
 					upsertPathway(tupleData.nodeIdB, tupleData.nodeIdA, tupleData.travelTime)
 				}
 			} else {
-				LoggerService.log(s"SKIPPING Travel Time of 0: $tupleData", "WARN", 6)
+				LogService.log(s"SKIPPING Travel Time of 0: $tupleData", "WARN", 6)
 			}
 		}
 		// for debugging
@@ -58,7 +58,7 @@ object PathwaysGrid {
 	// Display (to logs) the Nodes of the two-dimensional grid representing waypoint pathways or edges
 	private def showPathwayGrid(): Unit = {
 		val nodeIdList = nodeMap.toSeq.sortBy(_._1)
-		LoggerService.log(s"showPathwayGrid: $nodeIdList", "INFO", 2)
+		LogService.log(s"showPathwayGrid: $nodeIdList", "INFO", 2)
 		for ((nodeId, nodeType) <- nodeIdList) {
 			if (nodeType == NodeType.WAY) {
 				if (!(nodeId == "W10")) // re-order
@@ -76,11 +76,11 @@ object PathwaysGrid {
 		for ((k, v) <- node) {
 			showRow.append(s"$k:($v)  ")
 		}
-		LoggerService.log(s"showPathwayGrid: $showRow", "GRID")
+		LogService.log(s"showPathwayGrid: $showRow", "GRID")
 	}
 
 	// Store a list of all the Nodes and their types - waypoints or deposit locations
-	private def saveNodeTypes(tupleData: InputTravelTime) {
+	private def saveNodeTypes(tupleData: InputTravelTime): Unit = {
 		if (!nodeMap.contains(tupleData.nodeIdA)) {
 			nodeMap(tupleData.nodeIdA) = Node.determineNodeType(tupleData.nodeIdA)
 		}
@@ -99,10 +99,10 @@ object PathwaysGrid {
 		// If the second node is new, add it to the node map
 		if (!nodeGridMap(nodeIdA).contains(nodeIdB)) {
 			nodeGridMap(nodeIdA) += (nodeIdB -> travelTime)
-			LoggerService.log(s"Append Node: $nodeIdA  linked to: $nodeIdB  Time: $travelTime", msgCategory = "TIME")
+			LogService.log(s"Append Node: $nodeIdA  linked to: $nodeIdB  Time: $travelTime", msgCategory = "TIME")
 		} else {
 			nodeGridMap(nodeIdA)(nodeIdB) = travelTime
-			LoggerService.log(s"Update Node: $nodeIdA  Linked to: $nodeIdB  Time: $travelTime", msgCategory = "TIME")
+			LogService.log(s"Update Node: $nodeIdA  Linked to: $nodeIdB  Time: $travelTime", msgCategory = "TIME")
 		}
 	}
 }

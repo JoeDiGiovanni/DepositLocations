@@ -1,7 +1,7 @@
 package testpackage.com
 
 import testpackage.com.entities.{InvalidDataException, ParsedInputData, PathwaysGrid}
-import testpackage.com.services.{DataService, LocatorService, LoggerService}
+import testpackage.com.services.{DataService, LocateWithParallel, LocateWithRecursion, LogService}
 
 import scala.collection.immutable.List
 
@@ -18,18 +18,22 @@ object Main {
 		// build the connection paths as a two-dimensional grid
 		PathwaysGrid.buildPathwaysGrid(parsedInputData.timeDistanceData)
 
+		// Two ways to solve for the Deposit Location - use Parallel Threads vs Straight Recursion
+		//val locator = new LocateWithParallel()
+		val locator = new LocateWithRecursion()
+
 		// generate solution paths for each user and start point
 		for (user <- parsedInputData.users) {
 			try {
 				// InvalidDataException is thrown if any errors are found with the user data
-				LocatorService.validateUserStartNode(user.userName, user.nodeId)
-				val solutionPath = LocatorService.findPathToDepositLocation(user.nodeId)
+				locator.validateUserStartNode(user.userName, user.nodeId)
+				val solutionPath = locator.findPathToDepositLocation(user.nodeId)
 				// Format user name, waypoints, deposit location and distance into formatted string for output
 				val formattedOutput = (user.userName :: solutionPath).mkString(" ")
 				println(formattedOutput)
-				LoggerService.log(s"Solution Output: $formattedOutput", "XOUT", 5)
+				LogService.log(s"Solution Output: $formattedOutput", "XOUT", 5)
 			} catch {
-				case e: InvalidDataException => LoggerService.log(s"${e.message}", "ERRR", 6)
+				case e: InvalidDataException => LogService.log(s"${e.message}", "ERRR", 6)
 			}
 		}
 

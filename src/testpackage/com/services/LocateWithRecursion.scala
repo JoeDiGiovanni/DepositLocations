@@ -1,32 +1,19 @@
 package testpackage.com.services
 
-import testpackage.com.entities.{InvalidDataException, NodeType, PathwaysGrid}
+import testpackage.com.entities.{NodeType, PathwaysGrid}
+import testpackage.com.traits.Locator
 
 import scala.collection.immutable._
 import scala.collection.mutable
 
-object LocatorService {
-	var bestTimeToDepLoc:Int = 0
-	var bestPathToDepLoc:List[String] = _
-
-	// Validate the user name and the starting node - throw InvalidDataException if any issues found
-	def validateUserStartNode(userName: String, startNodeId: String): Unit = {
-		var errorMsg: String = ""
-		// Check if the user and start node are valid - if not then throw exception
-		if (PathwaysGrid.isValidWayPoint(userName)) errorMsg = "User Name should not be a Way Point"
-		if (!PathwaysGrid.isValidWayPoint(startNodeId)) errorMsg = "Starting Way Point is NOT VALID"
-		if (PathwaysGrid.isValidDepLoc(startNodeId)) errorMsg = "Starting Point is a Deposit Location"
-		if (!(errorMsg == "")) {
-			throw InvalidDataException(s"$errorMsg: $userName $startNodeId")
-		}
-	}
+class LocateWithRecursion extends Locator {
 
 	// Find the shorted path from the starting waypoint node to a deposit location
 	// Return the best path as determined by the shorted travel time
 	def findPathToDepositLocation(startNodeId: String): List[String] = {
 		bestTimeToDepLoc = PathwaysGrid.maxTravelTime
 		bestPathToDepLoc = List()
-		LoggerService.log(s"findPathToDepositLocation: StartNodeId: $startNodeId", "INFO", 2)
+		LogService.log(s"findPathToDepositLocation: StartNodeId: $startNodeId", "INFO", 2)
 
 		// get the Node of the Starting Location
 		val waypointNode = PathwaysGrid.nodeGridMap(startNodeId)
@@ -37,7 +24,7 @@ object LocatorService {
 	}
 
 	// Using the startNodeId - traverse the list of connections for this node (edges)
-	private def searchWayPointNode(waypointNode: mutable.Map[String, Int], curPath: List[String], totalTime: Int) {
+	private def searchWayPointNode(waypointNode: mutable.Map[String, Int], curPath: List[String], totalTime: Int): Unit = {
 		for ((nextNodeId: String, distance: Int) <- waypointNode) {
 			// if the node type is a deposit location, then this is a complete path
 			if ({PathwaysGrid.nodeMap(nextNodeId)} == NodeType.DEP) {
@@ -51,14 +38,14 @@ object LocatorService {
 					bestTimeToDepLoc = newTime
 					bestPathToDepLoc = bestTimeToDepLoc.toString :: solPath
 				}
-				LoggerService.log(s"Found: NodeId: $nextNodeId  Path: $solPath  Time: $newTime OK: ${newTime < bestTimeToDepLoc}", "PATH", 4)
+				LogService.log(s"Found: NodeId: $nextNodeId  Path: $solPath  Time: $newTime OK: ${newTime < bestTimeToDepLoc}", "PATH", 4)
 			} else {
 				// if the node type is a way point, continue looking with this new node
 				val waypointNode2 = PathwaysGrid.nodeGridMap(nextNodeId)
 				// check if exceeded best time or if about to backtrack
 				val okTime = totalTime + distance < bestTimeToDepLoc
 				val okPath = !curPath.contains(nextNodeId)
-				LoggerService.log(s"Trying:  NodeId: $nextNodeId  CurPath: $curPath  ok: $okTime/$okPath", "PATH", 4)
+				LogService.log(s"Trying:  NodeId: $nextNodeId  CurPath: $curPath  ok: $okTime/$okPath", "PATH", 4)
 				if (okTime && okPath) {
 					searchWayPointNode(waypointNode2, nextNodeId :: curPath, totalTime + distance)
 				}
